@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Request Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      margin: 20px;
+      background-color: #f5f5f5;
+      line-height: 1.4;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #007acc;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #666;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-left: 4px solid #007acc;
+      padding-left: 15px;
+    }
+    .detail-section {
+      margin-bottom: 25px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #fafafa;
+    }
+    .key-value {
+      display: flex;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .key {
+      font-weight: bold;
+      color: #007acc;
+      min-width: 200px;
+      margin-right: 10px;
+    }
+    .value {
+      color: #333;
+      word-break: break-all;
+      flex: 1;
+    }
+    .json-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+    .highlight {
+      background-color: #fff3cd;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+    .refresh-btn {
+      background: #007acc;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .refresh-btn:hover {
+      background: #005a99;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Request Details Inspector</h1>
+    
+    <button class="refresh-btn" onclick="window.location.reload()">🔄 Refresh Page</button>
+
+    <div class="detail-section">
+      <h2>📡 Basic Request Info</h2>
+      <div class="key-value">
+        <span class="key">Method:</span>
+        <span class="value highlight"><%= @request_details[:method] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">URL:</span>
+        <span class="value"><%= @request_details[:url] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Original URL:</span>
+        <span class="value"><%= @request_details[:original_url] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Path:</span>
+        <span class="value"><%= @request_details[:path] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Query String:</span>
+        <span class="value"><%= @request_details[:query_string].present? ? @request_details[:query_string] : "(empty)" %></span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h2>🌐 Host & Network Info</h2>
+      <div class="key-value">
+        <span class="key">Host:</span>
+        <span class="value highlight"><%= @request_details[:host] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Host with Port:</span>
+        <span class="value"><%= @request_details[:host_with_port] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Port:</span>
+        <span class="value"><%= @request_details[:port] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Scheme:</span>
+        <span class="value"><%= @request_details[:scheme] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Remote IP:</span>
+        <span class="value highlight"><%= @request_details[:remote_ip] %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Origin:</span>
+        <span class="value"><%= @request_details[:origin] || "(not set)" %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Referer:</span>
+        <span class="value"><%= @request_details[:referer] || "(not set)" %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">User Agent:</span>
+        <span class="value"><%= @request_details[:user_agent] %></span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h2>📄 Content Info</h2>
+      <div class="key-value">
+        <span class="key">Content Type:</span>
+        <span class="value"><%= @request_details[:content_type] || "(not set)" %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Content Length:</span>
+        <span class="value"><%= @request_details[:content_length] || "(not set)" %></span>
+      </div>
+      <div class="key-value">
+        <span class="key">Body:</span>
+        <span class="value"><%= @request_details[:body].present? ? @request_details[:body] : "(empty)" %></span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h2>📊 Parameters</h2>
+      <div class="json-block"><%= JSON.pretty_generate(@request_details[:params]) %></div>
+    </div>
+
+    <div class="detail-section">
+      <h2>🍪 Cookies</h2>
+      <% if @request_details[:cookies].any? %>
+        <div class="json-block"><%= JSON.pretty_generate(@request_details[:cookies]) %></div>
+      <% else %>
+        <p><em>No cookies found</em></p>
+      <% end %>
+    </div>
+
+    <div class="detail-section">
+      <h2>🗂️ Session</h2>
+      <% if @request_details[:session].any? %>
+        <div class="json-block"><%= JSON.pretty_generate(@request_details[:session]) %></div>
+      <% else %>
+        <p><em>No session data</em></p>
+      <% end %>
+    </div>
+
+    <div class="detail-section">
+      <h2>📋 All Headers</h2>
+      <div class="json-block"><%= JSON.pretty_generate(@request_details[:headers].sort.to_h) %></div>
+    </div>
+
+    <div class="detail-section">
+      <h2>⚙️ Environment Variables</h2>
+      <div class="json-block"><%= JSON.pretty_generate(@request_details[:env_variables].sort.to_h) %></div>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px; color: #666;">
+      Generated at <%= Time.current.strftime("%Y-%m-%d %H:%M:%S %Z") %>
+    </p>
+  </div>
+</body>
+</html>
